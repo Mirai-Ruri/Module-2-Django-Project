@@ -1,0 +1,82 @@
+{% extends 'components/base_auth2.html' %}
+
+{% block title %}Order List{% endblock %}
+
+{% block body %}
+
+<div class="container my-5">
+    <div class="card shadow-lg">
+
+        <div class="card-header d-flex">
+            <div class="me-auto d-flex">
+                <a href="#" class="btn btn-muted text-danger">Order Placement : [ {{order_item_count}} ] Items</a>
+            </div>
+
+        </div>
+        <div class="card-body">
+            {% if order_items %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" class=" text-center align-middle">No.</th>
+                        <th scope="col" class=" text-center align-middle">Image</th>
+                        <th scope="col" class=" text-center align-middle">Name</th>
+                        <th scope="col" class=" text-center align-middle">Quantity</th>
+                        <th scope="col" class=" text-center align-middle">Price</th>
+                        <th scope="col" class=" text-center align-middle">Total</th>
+                        <th scope="col" class=" text-center align-middle">Customer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in order_items %}
+                    <tr>
+                        <th scope="col" class=" text-center align-middle">{{ forloop.counter }}</th>
+                        <th scope="col" class=" text-center align-middle">
+                            {% if order_item.cart_item.product.image %}
+                            <img src="{{ order_item.cart_item.product.image.url }}" alt="{{ order_item.cart_item.product.name }}"
+                                class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <img src="{{ MEDIA_URL }}product_images/default_product.png"
+                                alt="{{ order_item.cart_item.product.name }}" class="img-thumbnail"
+                                style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                        </th>
+                        <th scope="col" class=" text-center align-middle">{{ order_item.cart_item.product.name }}</th>
+                        <th scope="col" class=" text-center align-middle">{{ order_item.cart_item.quantity }}</th>
+                        <th scope="col" class=" text-center align-middle">${{ order_item.cart_item.product.price }}</th>
+                        <th scope="col" class=" text-center align-middle">${{ order_item.cart_item.total_price }}</th>
+                        <th class="text-center align-middle">
+
+                            {% if user.profilemodel %}
+                            <img src="{{ order_item.user.profilemodel.image.url }}" alt="{{ order_item.user.username }}" class="img-thumbnail"
+                                style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <img src="{{ MEDIA_URL }}user_profile_images/default_profile.png" alt="{{ order_item.user.username }}"
+                                class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                            <p>{{order_item.user.username}}</p>
+
+                        </th>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center align-middle">
+                        <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                            style="width: 300px; height: 300px; object-fit: cover;">
+                        <p class="text-muted">No order placements.</p>
+                    </div>
+                    {% endif %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}

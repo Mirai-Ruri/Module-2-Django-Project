@@ -1,0 +1,121 @@
+{% extends 'components/base.html' %}
+
+{% block title %}Main{% endblock %}
+
+{% block body %}
+
+<h3 class="text-center p-lg-5">---Your Wishlist---</h3>
+
+<div class="container my-5">
+    <div class="row mb-lg-5" data-masonry='{"percentPosition": true }'>
+        {% if items %}
+        {% for item in items %}
+        <div class="col-lg-3 mb-4">
+            <div class="card product" data-bs-toggle="modal" data-bs-target="#detailModal{{ item.product.id }}">
+                <div class="product_image">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="card-img-top image">
+                    {% else %}
+                    <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ item.product.name }}"
+                        class="card-img-top image">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.product.name }}</h5>
+                    <p class="card-text text-truncate">{{ item.product.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="text-center align-middle">
+            <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                style="width: 300px; height: 300px; object-fit: cover;">
+            <p class="text-muted">No wishlists found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-------PRODUCT_DETAIL_MODAL------->
+{% for item in items %}
+<div class="modal fade" id="detailModal{{ item.product.id }}" tabindex="-1"
+    aria-labelledby="detailModalLabel{{ item.product.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="modal-title" id="detailModalLabel{{ item.product.id }}">
+                    {{ item.product.name }}</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body detail">
+
+                <div class="detail_image">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="detail_img">
+                    {% else %}
+                    <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ item.product.name }}"
+                        class="detail_img">
+                    {% endif %}
+                </div>
+
+                <div class="detail_text">
+                    <div class="card-body mx-5">
+                        <h3 class="card-title">{{ item.product.name }}</h3>
+                        <p class="card-text">${{ item.product.price }}</p>
+                        <hr style="border: none; height: 3px; background: black;">
+                        <p class="card-text">
+                        <h6>Description:</h6><br>{{ item.product.description }}</p>
+                        <p class="card-text"><small class="text-muted">Last Update: {{item.product.updated_at}}</small>
+                        </p>
+                        <hr style="border: none; height: 3px; background: black;">
+                        <form method="POST" action="/product/cart/add/{{ product.id }}/" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="detail_dropdown">
+                                <select style="height: 37.6px;">
+                                    {% for i in numbers %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary" value="{{ product.id }}">Add To
+                                    Cart</button>
+                            </div>
+                        </form>
+                        
+                        {% if not item.product.id %}
+                        <form class="mt-2" method="POST" action="/wish/list/add/{{ product.id }}/"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" value="{{ product.id }}"><i
+                                    class="bi bi-heart"></i> Add To
+                                Wishlist</button>
+                        </form>
+                        {% else %}
+                        <form class="mt-2" method="POST" action="/wish/list/delete/{{ item.product.id }}/"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" value="{{ product.id }}"><i
+                                    class="bi bi-heart-fill"></i> Added</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

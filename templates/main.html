@@ -1,0 +1,219 @@
+{% extends 'components/base.html' %}
+
+{% block title %}Main{% endblock %}
+
+{% block body %}
+
+<div class="d-flex header_image ms-3 mt-5">
+    <img src="{{ MEDIA_URL }}static_images/download (10).jpg" style="width: fit-content; height:fit-content;"
+        class="header_img">
+    <img src="{{ MEDIA_URL }}static_images/download (9).jpg" style="width: fit-content; height:fit-content;"
+        class="header_img">
+</div>
+
+<div class="container my-5 p-5">
+    <div class="swiper mySwiper">
+
+        <div class="swiper-wrapper">
+            {% for category in categories %}
+            <div class="swiper-slide text-center">
+
+                {% if category.image %}
+                <a href="?search={{ category.name }}">
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}"
+                        style="width:150px;height:150px;border-radius:50%;object-fit:cover;">
+                </a>
+                {% else %}
+                <a href="?search={{ category.name }}">
+                    <img src="{{ MEDIA_URL }}category_images/default_product.png" alt="{{ category.name }}"
+                        style="width:150px;height:150px;border-radius:50%;object-fit:cover;">
+                </a>
+                {% endif %}
+
+                <p class="mt-2">{{ category.name }}</p>
+
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <div class="p-3">
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+    </div>
+</div>
+
+
+<form class=" d-flex w-50 ms-auto">
+    <input class="form-control w-50 ms-auto" type="search" placeholder="Search" aria-label="Search"
+        value="{{ request.GET.search }}" name="search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+
+
+<h3 class="text-center p-lg-5">---For You---</h3>
+
+<div class="container my-5">
+    <div class="row mb-lg-5" data-masonry='{"percentPosition": true }'>
+        {% if products %}
+        {% for product in products %}
+        <div class="col-lg-3 mb-4">
+            <div class="card product" data-bs-toggle="modal" data-bs-target="#detailModal{{ product.id }}">
+                <div class="product_image">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top image">
+                    {% else %}
+                    <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ product.name }}"
+                        class="card-img-top image">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-truncate">{{ product.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if products.has_other_pages %}
+        <div style="display: flex; justify-content: center;">
+            <nav aria-label="Topics pagination" class="mb-4">
+                <ul class="pagination">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    {% endif %}
+                    {% for page_num in products.paginator.page_range %}
+                    {% if products.number == page_num %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_num }}
+                        </span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center align-middle">
+            <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                style="width: 300px; height: 300px; object-fit: cover;">
+            <p class="text-muted">No products found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-------PRODUCT_DETAIL_MODAL------->
+{% for product in products %}
+<div class="modal fade" id="detailModal{{ product.id }}" tabindex="-1"
+    aria-labelledby="detailModalLabel{{ product.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="modal-title" id="detailModalLabel{{ product.id }}">
+                    {{ product.name }}</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body detail">
+
+                <div class="detail_image">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail_img">
+                    {% else %}
+                    <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ product.name }}"
+                        class="detail_img">
+                    {% endif %}
+                </div>
+
+                <div class="detail_text">
+                    <div class="card-body mx-5">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        <p class="card-text">${{ product.price }}</p>
+                        <hr style="border: none; height: 3px; background: black;">
+                        <p class="card-text">
+                        <h6>Description:</h6><br>{{ product.description }}</p>
+                        <p class="card-text"><small class="text-muted">Last Update: {{ product.updated_at }}</small></p>
+                        <hr style="border: none; height: 3px; background: black;">
+
+                        <form method="POST" action="/cart/list/add/{{ product.id }}/" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="detail_dropdown">
+                                <select name="quantity" style="height: 37.6px;">
+                                    {% for quantity in quantities %}
+                                    <option value="{{ quantity }}">{{ quantity }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary" value="{{ product.id }}">Add To
+                                    Cart</button>
+                            </div>
+                        </form>
+
+
+                        </form>
+
+                        {% if not request.user in product.reaction.all %}
+                        <form class="mt-2" method="POST" action="/wish/list/add/{{ product.id }}/"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" value="{{ product.id }}"><i
+                                    class="bi bi-heart"></i> Add To
+                                Wishlist</button>
+                        </form>
+
+                        {% else %}
+
+                        <form class="mt-2" method="POST" action="/wish/list/delete/{{ product.id }}/"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" value="{{ product.id }}"><i
+                                    class="bi bi-heart-fill"></i> Added</button>
+                        </form>
+                        {% endif %}
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endfor %}
+
+
+
+{% endblock %}

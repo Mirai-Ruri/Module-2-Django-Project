@@ -1,0 +1,415 @@
+{% extends 'components/base_auth2.html' %}
+
+{% block title %}Workplace{% endblock %}
+
+{% block body %}
+
+
+<div class="container my-5">
+    <div class="card shadow-lg">
+
+        <div class="card-header d-flex">
+            <div class="me-auto d-flex">
+
+                <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">Add New
+                    Product</a>
+                <a href="#" class="btn btn-info" id="addNewCategory" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasScrolling">Category</a>
+                <a href="#" class="btn btn-muted text-danger">Total Products : [ {{product_count}} ]</a>
+
+            </div>
+
+            <div class="ms-4">
+                <li class="nav-item dropdown list-unstyled">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for category in categories %}
+                        <li>
+                            <a class="dropdown-item" href="?search={{ category.name }}">{{ category.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </div>
+
+            <form class="d-flex ms-5">
+                <input class="form-control w-50 me-2" type="search" placeholder="Search" aria-label="Search"
+                    value="{{ request.GET.search }}" name="search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+
+        </div>
+        <div class="card-body">
+            {% if products %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" class=" text-center align-middle">No.</th>
+                        <th scope="col" class=" text-center align-middle">Image</th>
+                        <th scope="col" class=" text-center align-middle">Name</th>
+                        <th scope="col" class=" text-center align-middle">Stock</th>
+                        <th scope="col" class=" text-center align-middle">Price</th>
+                        <th scope="col" class=" text-center align-middle">Category</th>
+                        <th scope="col" class=" text-center align-middle">Action</th>
+                        <!-- <th scope="col" class=" text-center align-middle">More</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <th scope="col" class=" text-center align-middle">{{ forloop.counter }}</th>
+                        <th scope="col" class=" text-center align-middle">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail"
+                                style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ product.name }}"
+                                class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                        </th>
+                        <th scope="col" class=" text-center align-middle">{{ product.name }}</th>
+                        <th scope="col" class=" text-center align-middle">{{ product.stock }}</th>
+                        <th scope="col" class=" text-center align-middle">{{ product.price }}</th>
+                        <th scope="col" class=" text-center align-middle">{{ product.category }}</th>
+                        <th class="text-center align-middle">
+                            <a href="#" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#updateModal{{ product.id }}"><i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="#" class="btn btn-secondary" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ product.id }}"><i class="bi bi-trash3"></i></a>
+                        </th>
+                        <!-- <th class="text-center">
+
+                            {% if product.is_active %}
+                            <form method="POST" action="/product/activate/{{ product.id }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Activate</button>
+                            </form>
+                            <form method="POST" action="/product/deactivate/{{ product.id }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Deactivate</button>
+                            </form>
+                            {% endif %}
+
+                        </th> -->
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center align-middle">
+                        <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                            style="width: 300px; height: 300px; object-fit: cover;">
+                        <p class="text-muted">No products added.</p>
+                    </div>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% if products.has_other_pages %}
+        <div style="display: flex; justify-content: center;">
+            <nav aria-label="Topics pagination" class="mb-4">
+                <ul class="pagination">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    {% endif %}
+                    {% for page_num in products.paginator.page_range %}
+                    {% if products.number == page_num %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_num }}
+                        </span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-------PRODUCT_CREATE_MODAL------->
+
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true"
+    data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <form class="modal-content" method="POST" action="/product/create/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter product name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <input type="number" name="price" id="price" class="form-control" placeholder="Enter product price">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="stock">Stock</label>
+                    <input type="number" name="stock" id="stock" class="form-control" placeholder="Enter product stock">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <input type="text" name="description" id="description" class="form-control"
+                        placeholder="Enter product description">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="category">Category</label>
+                    <select name="category" class="form-control">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Image</label>
+                    <input type="file" name="image" id="image" class="form-control">
+                </div>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-------PRODUCT_UPDATE_MODAL------->
+
+{% for product in products %}
+<div class="modal fade" id="updateModal{{ product.id }}" tabindex="-1" aria-labelledby="updateModalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="POST" action="/product/update/{{ product.id }}/"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Product Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 text-center align-middle">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail"
+                        style="width: 80px; height: 80px; object-fit: cover;">
+                    {% else %}
+                    <img src="{{ MEDIA_URL }}product_images/default_product.png" alt="{{ product.name }}"
+                        class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter product name"
+                        value="{{ product.name }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <input type="number" name="price" id="price" class="form-control" placeholder="Enter product price"
+                        value="{{ product.price }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="stock">Stock</label>
+                    <input type="number" name="stock" id="stock" class="form-control" placeholder="Enter product stock"
+                        value="{{ product.stock }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea type="text" name="description" id="description" class="form-control"
+                        placeholder="Enter product description">{{ product.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="category">Category</label>
+                    <select name="category" class="form-control">
+                        {% for category in categories %}
+                        <option {% if category.id == product.category.id %}selected{% endif %} value="{{ category.id }}">
+                            {{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Image</label>
+                    <input type="file" name="image" id="image" class="form-control" value="{{ product.image }}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<!-------PRODUCT_DELETE_MODAL------->
+
+{% for product in products %}
+<div class="modal fade" id="deleteModal{{ product.id }}" tabindex="-1" aria-labelledby="deleteModalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="POST" action="/product/delete/{{ product.id }}/"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Product Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-------CATEGORIES_LIST_OFFCANVAS------->
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+    id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Categories</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add New Category
+        </button>
+        <a href="#" class="btn btn-muted text-danger">Total Categories : [ {{category_count}} ]</a>
+        {% if categories %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class=" text-center align-middle">No.</th>
+                    <th scope="col" class=" text-center align-middle">Image</th>
+                    <th scope="col" class=" text-center align-middle">Name</th>
+                    <th scope="col" class=" text-center align-middle">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <th scope="col" class=" text-center align-middle">{{ forloop.revcounter }}</th>
+                    <th scope="col" class=" text-center align-middle">
+                        {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-thumbnail"
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                        <img src="{{ MEDIA_URL }}category_images/default_product.png" alt="{{ category.name }}"
+                            class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% endif %}
+                    </th>
+                    <th scope="col" class=" text-center align-middle">{{ category.name }}</th>
+                    <th class="text-center align-middle">
+                        <form method="POST" action="/category/delete/{{ category.id }}/">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary"><i class="bi bi-trash3"></i></button>
+                        </form>
+                    </th>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <div class="text-center align-middle">
+                    <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                        style="width: 150px; height: 150px; object-fit: cover;">
+                    <p class="text-muted">No products added.</p>
+                </div>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+<!-------CATEGORY_CREATE_OFFCANVAS------->
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <form class="modal-content" method="POST" action="/category/create/" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label" for="name">Name</label>
+                            <input type="text" name="name" id="name" class="form-control"
+                                placeholder="Enter category name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="image">Image</label>
+                            <input type="file" name="image" id="image" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endfor %}
+
+{% endblock %}

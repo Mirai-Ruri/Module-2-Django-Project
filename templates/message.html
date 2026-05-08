@@ -1,0 +1,100 @@
+{% extends 'components/base_auth2.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% load humanize %}
+
+{% block body %}
+
+<div class="container my-5">
+    <div class="card shadow-lg">
+
+        <div class="card-header d-flex">
+
+            <a href="#" class="btn btn-muted text-danger">Total Messages : [ {{message_count}} ]</a>
+
+            <form class="d-flex ms-auto">
+                <input class="form-control w-50 me-2" type="search" placeholder="Search" aria-label="Search"
+                    value="{{ request.GET.search }}" name="search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+
+        </div>
+        <div class="card-body">
+            {% if user_messages %}
+            <table class="table">
+                <tbody>
+                    {% for user_message in user_messages %}
+                    <tr>
+
+                        <th scope="col" class=" text-center align-middle">{{ forloop.counter }}</th>
+                        <th scope="col" class=" text-center align-middle">
+                            <a href="#" class="text-decoration-none" data-bs-toggle="modal"
+                                data-bs-target="#messageModal{{ user_message.id }}">{{user_message.author.username}}
+                                sent a message.</a>
+                        </th>
+
+
+                        <th scope="col" class=" text-center align-middle">
+                            <form method="POST" action="/user/message/delete/{{ user_message.id }}/">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </th>
+
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center align-middle">
+                        <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No messages sent Yet"
+                            style="width: 300px; height: 300px; object-fit: cover;">
+                        <p class="text-muted">No messages sent yet.</p>
+                    </div>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!----------MESSAGE_MODAL---------->
+
+{% for user_message in user_messages %}
+<div class="modal fade" id="messageModal{{ user_message.id }}" tabindex="-1"
+    aria-labelledby="messageModalLabel{{ user_message.id }}" aria-hidden="true" data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="messageModalLabel{{ user_message.id }}">
+                    {% if user_message.author %}
+                    From {{ user_message.author.username }}
+                    {% else %}
+                    From Anonymous
+                    {% endif %}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                {{ user_message.user_message }}
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <span class="text-muted me-auto">{{user_message.created_at | naturalday}}</span>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

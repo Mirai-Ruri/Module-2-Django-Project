@@ -1,0 +1,159 @@
+{% extends 'components/base.html' %}
+
+{% block title %}Cart List{% endblock %}
+
+{% block body %}
+
+<h3 class="text-center p-lg-5">---Your Cart Item List---</h3>
+
+<div class="d-flex">
+    <div class="container my-3">
+        <div class="card shadow-lg">
+
+            <div class="card-header d-flex">
+                <div class="me-auto d-flex">
+                    <a href="#" class="btn btn-muted text-danger">Shopping Cart : [ {{cart_item_count}} ] Items</a>
+                </div>
+
+            </div>
+            <div class="card-body">
+                {% if cart_items %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class=" text-center align-middle">No.</th>
+                            <th scope="col" class=" text-center align-middle">Image</th>
+                            <th scope="col" class=" text-center align-middle">Name</th>
+                            <th scope="col" class=" text-center align-middle">Quantity</th>
+                            <th scope="col" class=" text-center align-middle">Price</th>
+                            <th scope="col" class=" text-center align-middle">Total</th>
+                            <th scope="col" class=" text-center align-middle"></th>
+                            <th scope="col" class=" text-center align-middle"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cart_item in cart_items %}
+                        <tr>
+                            <th scope="col" class=" text-center align-middle">{{ forloop.counter }}</th>
+                            <th scope="col" class=" text-center align-middle">
+                                {% if cart_item.product.image %}
+                                <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}"
+                                    class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                <img src="{{ MEDIA_URL }}product_images/default_product.png"
+                                    alt="{{ cart_item.product.name }}" class="img-thumbnail"
+                                    style="width: 80px; height: 80px; object-fit: cover;">
+                                {% endif %}
+                            </th>
+                            <th scope="col" class=" text-center align-middle">{{ cart_item.product.name }}</th>
+                            <th scope="col" class=" text-center align-middle">{{ cart_item.quantity }}</th>
+                            <th scope="col" class=" text-center align-middle">${{ cart_item.product.price }}</th>
+                            <th scope="col" class=" text-center align-middle">${{ cart_item.total_price }}</th>
+                            <th scope="col" class=" text-center align-middle">
+                                <button type="submit" class="btn btn-info" value="#" data-bs-toggle="modal"
+                                    data-bs-target="#checkoutModal{{cart_item.id}}">CHECKOUT</button>
+                            </th>
+                            <th scope="col" class=" text-center align-middle">
+                                <form method="POST" action="/cart/list/delete/{{cart_item.id}}/">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary"><i
+                                            class="bi bi-trash3"></i></button>
+                                </form>
+                            </th>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center align-middle">
+                            <img src="{{ MEDIA_URL }}static_images/no_product.png" alt="No Products Added Yet"
+                                style="width: 300px; height: 300px; object-fit: cover;">
+                            <p class="text-muted">No products added to cart.</p>
+                        </div>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="card shadow-lg me-3 my-3" style="height: 18rem;">
+
+
+        <div class="card-body">
+
+
+            <table class="table">
+
+                <tbody>
+                    <tr>
+                        <th scope="col" class="align-middle text-danger">Subtotal</th>
+                        <th scope="col" class=" text-center align-middle">[ {{cart_item_count}} ] Items</th>
+                    </tr>
+                    <tr>
+                        <th scope="col" class="align-middle text-danger">Delivery Costs</th>
+                        <th scope="col" class=" text-center align-middle">FREE!</th>
+                    </tr>
+                    <tr>
+                        <th scope="col" class="align-middle text-danger">Discount</th>
+                        <th scope="col" class=" text-center align-middle">-</th>
+                    </tr>
+                    <tr>
+                        <th scope="col" class="align-middle text-danger">Total</th>
+                        <th scope="col" class=" text-center align-middle">${{ overall_total }}</th>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!----------CHECKOUT_MODAL---------->
+{% for cart_item in cart_items %}
+<div class="modal fade" id="checkoutModal{{cart_item.id}}" tabindex="-1" aria-labelledby="checkoutModalLabel{{cart_item.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="checkoutModalLabel{{cart_item.id}}">Customer Info</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+
+                <input type="text" name="fullname" class="form-control mt-2" id="fullname" style="height: 1.5rem;"
+                    placeholder="Fullname" required>
+
+                <input type="email" name="email" class="form-control mt-3" id="email" style="height: 1.5rem;"
+                    placeholder="Email" required>
+                <hr>
+                <h1 class="modal-title fs-5">Delivery Address</h1>
+
+                <input type="text" name="state" class="form-control mt-2" id="state" style="height: 1.5rem;"
+                    placeholder="State" required>
+
+                <input type="text" name="city" class="form-control mt-3" id="city" style="height: 1.5rem;"
+                    placeholder="City" required>
+
+                <input type="text" name="street_address" class="form-control mt-3" id="street_address"
+                    style="height: 1.5rem;" placeholder="Street Address" required>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="/order/list/add/{{cart_item.id}}/">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

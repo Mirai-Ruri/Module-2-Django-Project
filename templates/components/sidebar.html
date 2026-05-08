@@ -1,0 +1,68 @@
+<div class="d-flex mt-5 mb-5">
+
+    <div id="sidebar" class="bg-dark text-white p-3">
+        {% if user.is_superuser %}
+        <h3 class="text-danger">Superuser</h3>
+        {% elif user.is_staff %}
+        <h3 class="text-warning">Staff</h3>
+        {% else %}
+        <h3 class="text-secondary">User</h3>
+        {% endif %}
+        <hr>
+
+        <div class=" text-center align-middle mt-4 mb-5">
+            <img src="{{ user.profilemodel.image.url }}" alt="Profile" class="img-thumbnail"
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+            <h4>{{user.username}}</h4>
+        </div>
+
+        <ul class="nav flex-column">
+
+            <li class="nav-item">
+                <a href="/work/place/" class="nav-link text-white">
+                    <i class="bi bi-box-seam me-2"></i> Products
+                </a>
+            </li>
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="/order/list/view/" class="nav-link text-white">
+                    <i class="bi bi-cart me-2"></i> Orders
+                </a>
+            </li>
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="/registered/users/" class="nav-link text-white">
+                    <i class="bi bi-people me-2"></i> Users
+                </a>
+            </li>
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="/user/message/list/" class="nav-link text-white">
+                    <i class="bi bi-envelope me-2"></i> Messages
+                </a>
+            </li>
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="#" class="nav-link text-white">
+                    <i class="bi bi-gear me-2"></i> Settings
+                </a>
+            </li>
+
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="/user/logout/" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </a>
+            </li>
+
+            <hr class="text-secondary">
+
+        </ul>
+    </div>
+
+</div>

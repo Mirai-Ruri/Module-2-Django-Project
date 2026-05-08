@@ -1,0 +1,286 @@
+<header>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid glass_nav">
+            <a class="navbar-brand title ms-5 fs-2" href="/main/page/">Crystal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/main/page/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% for category in categories %}
+                            <li>
+                                <a class="dropdown-item" href="?search={{ category.name }}">{{ category.name }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav me-auto gap-3 ms-auto">
+
+                    <li>
+                        <a class="nav-link d-flex align-items-center" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" href="#">
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Profile</p>
+                        </a>
+                    </li>
+
+                    {% if request.user.is_staff %}
+                    <li>
+                        <a class="nav-link d-flex align-items-center" href="/work/place/">
+                            <i class="bi bi-clipboard-data" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Dashboard</p>
+                        </a>
+                    </li>
+
+                    {% else %}
+
+                    <li>
+                        <a class="nav-link d-flex align-items-center" href="/cart/list/view/">
+                            <i class="bi bi-cart3" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Cart</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link d-flex align-items-center" href="/wish/list/view/">
+                            <i class="bi bi-heart" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Wishlist</p>
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                    <li>
+                        <a href="/contact/" class="nav-link d-flex align-items-center">
+                            <i class="bi bi-headset" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Contact</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/user/logout/" class="nav-link d-flex align-items-center">
+                            <i class="bi bi-box-arrow-right" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Logout</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="nav-link d-flex align-items-center">
+                            <i class="bi bi-gear" style="font-size: 1.5rem;"></i>
+                            <p class="text-muted" style="font-size: x-small;">Setting</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!----------PROFILE_OFFCANVAS---------->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Profile Info</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+
+            <div class=" text-center align-middle mt-2 mb-5">
+                <img src="{{ user.profilemodel.image.url }}" alt="Profile" class="img-thumbnail"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+                <h5>{{user.username}}</h5>
+            </div>
+
+            <p><i class="bi bi-envelope"></i> Email: {{user.email}}</p>
+            <hr>
+
+            <div>
+                <a href="#" class="d-block text-dark text-decoration-none" data-bs-toggle="modal"
+                    data-bs-target="#updateProfileModal{{user.id}}">
+                    <p><i class="bi bi-pencil-square"></i> Update Profile</p>
+                </a>
+            </div>
+            <hr>
+
+            <div>
+                <a href="#" class="d-block text-dark text-decoration-none" data-bs-toggle="modal"
+                    data-bs-target="#changePasswordModal{{user.id}}">
+                    <p><i class="bi bi-lock"></i> Change Password</p>
+                </a>
+            </div>
+            <hr>
+
+            {% if request.user.is_staff %}
+            <div>
+                <a href="/work/place/" class="d-block text-dark text-decoration-none">
+                    <p><i class="bi bi-person-check"></i> Admin Dashboard</p>
+                </a>
+            </div>
+            {% else %}
+            <div>
+                <!-- <a href="/work/place/" class="d-block text-dark text-decoration-none">
+                    <p><i class="bi bi-wrench"></i> Go To Workplace</p>
+                </a>
+                <hr> -->
+
+                <a href="/cart/list/view/" class="d-block text-dark text-decoration-none">
+                    <p><i class="bi bi-cart3"></i> Cart</p>
+                </a>
+                <hr>
+
+                <a href="/wish/list/view/" class="d-block text-dark text-decoration-none">
+                    <p><i class="bi bi-heart"></i> Wishlist</p>
+                </a>
+
+            </div>
+            {% endif %}
+            <hr>
+
+            <a href="/contact/" class="d-block text-dark text-decoration-none">
+                <p><i class="bi bi-headset"></i> Contact Us</p>
+            </a>
+            <hr>
+
+            <div>
+                <a href="/user/logout/" class="d-block text-decoration-none text-danger">
+                    <p><i class="bi bi-box-arrow-right"></i> Logout</p>
+                </a>
+            </div>
+            <hr>
+
+            <div>
+                <a href="#" class="d-block text-decoration-none text-danger" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal{{user.id}}">
+                    <p><i class="bi bi-exclamation-triangle"></i> Delete Account</p>
+                </a>
+            </div>
+            <hr>
+
+        </div>
+    </div>
+
+    <!----------UPDATE_ACCOUNT_MODAL---------->
+
+    <div class="modal fade" id="updateProfileModal{{user.id}}" tabindex="-1"
+        aria-labelledby="updateProfileModalLabel{{user.id}}" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="POST" action="/user/update/{{user.id}}/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateProfileModalLabel">Profile Update</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-center align-middle">
+                        {% if user.profilemodel.image %}
+                        <img src="{{ user.profilemodel.image.url }}" alt="{{ user.username }}" class="img-thumbnail"
+                            style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                        <img src="{{ MEDIA_URL }}user_profile_images/default_profile.png" alt="{{ user.username }}"
+                            class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" name="username" id="username" class="form-control"
+                            placeholder="Enter product name" value="{{ user.username }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="image">Image</label>
+                        <input type="file" name="image" id="image" class="form-control" value="{{ user.image }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!----------DELETE_ACCOUNT_MODAL---------->
+    <div class="modal fade" id="exampleModal{{user.id}}" tabindex="-1" aria-labelledby="exampleModalLabel{{user.id}}"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST" action="/user/delete/{{user.id}}/">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel{{user.id}}">Warning</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete your account?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!----------CHANGE_PASSWORD_MODAL---------->
+    <div class="modal fade" id="changePasswordModal{{user.id}}" tabindex="-1"
+        aria-labelledby="changePasswordModalLabel{{user.id}}" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="POST" action="/change/password/"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-center align-middle">
+                        {% if user.profilemodel.image %}
+                        <img src="{{ user.profilemodel.image.url }}" alt="{{ user.username }}" class="img-thumbnail"
+                            style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                        <img src="{{ MEDIA_URL }}user_profile_images/default_profile.png" alt="{{ user.username }}"
+                            class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="old_pw">Old Password</label>
+                        <input type="password" name="old_pw" id="old_pw" class="form-control"
+                            placeholder="Enter old password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="new_pw">New Password</label>
+                        <input type="password" name="new_pw" id="new_pw" class="form-control"
+                            placeholder="Enter new password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="confirm_pw">Confirm Password</label>
+                        <input type="password" name="confirm_pw" id="confirm_pw" class="form-control"
+                            placeholder="Confirm new password">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Change</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+</header>

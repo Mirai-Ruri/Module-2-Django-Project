@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dosis:wght@200..800&display=swap');
+
+
+* {
+    font-family: "Dosis", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    list-style-type: none;
+    text-decoration: none;
+}
+
+body {
+    background: #F3FAF6;
+}
+
+.title {
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* ==========HEADER========== */
+
+.glass_nav {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+.navbar {
+    background-color: transparent;
+}
+
+.header_image {
+    top: 0;
+    z-index: 80;
+}
+
+.header_img {
+    filter: saturate(60%) brightness(1.1);
+    object-fit: contain;
+}
+
+
+/* ==========ADMIN_DASHBOARD==========  */
+
+#sidebar {
+    width: 300px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+/* ==========PRODUCT_CARD========== */
+
+.card.product:hover {
+    border: 3px solid #1B9AAA;
+    box-shadow:
+        0 0 5px #1B9AAA,
+        0 0 15px #1B9AAA,
+        0 0 30px #1B9AAA,
+        0 0 60px #1B9AAA;
+}
+
+.product_image {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.card.product {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top.image {
+    transition: transform 0.5s ease;
+}
+
+.card.product:hover .card-img-top.image {
+    transform: scale(1.2);
+}
+
+.modal-body.detail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: auto;
+    margin: auto;
+}
+
+/* ==========PRODUCT_DETAIL_CARD========== */
+
+.detail_image {
+    width: 100%;
+    height: 100%;
+}
+
+.detail_img {
+    width: 100%;
+    height: 100%;
+}
+
+.detail_text {
+    border-color: black;
+}
+
+.detail_dropdown {
+    display: flex;
+}
+
+/* ==========FOOTER========== */
+
+footer {
+    background-color: #FFFFFF;
+    margin: 0;
+    padding: 1rem 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+
+}
+
+.footer_list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    list-style-type: none;
+}
+
+.social_icon_list {
+    display: flex;
+    list-style-type: none;
+}
+
+.social_icon_item {
+    padding: 1rem;
+}
+
+.footer_menu_disclaimer {
+    text-align: center;
+}
+
