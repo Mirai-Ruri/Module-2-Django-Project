@@ -24,7 +24,6 @@ packaging==25.0
 pillow==11.3.0
 pipenv==2026.0.2
 platformdirs==4.5.1
-psycopg2==2.9.12
 psycopg2-binary==2.9.11
 pydantic==2.12.5
 pydantic_core==2.41.5
