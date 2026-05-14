@@ -1,4 +1,4 @@
-s"""
+"""
 WSGI config for crystal_django project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
